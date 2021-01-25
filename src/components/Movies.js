@@ -3,6 +3,8 @@ import { MovieContext } from "../context";
 import Movie from "./Movie";
 import styled from "styled-components";
 import ReactLoading from "react-loading";
+import { IMAGE_BASE_URL, POSTER_SIZE } from "../API";
+import NoImage from "../assets/no_image.jpg";
 
 export default function Movies() {
   const { movies } = useContext(MovieContext);
@@ -12,7 +14,20 @@ export default function Movies() {
       <Wrapper>
         <section>
           {movies.map((item) => {
-            return <Movie key={item.id} item={item} />;
+            return (
+              <Movie
+                key={item.id}
+                clickable
+                image={
+                  item.poster_path
+                    ? IMAGE_BASE_URL + POSTER_SIZE + item.poster_path
+                    : NoImage
+                }
+                ratings={item.vote_average}
+                movieId={item.id}
+                movieName={item.original_title}
+              />
+            );
           })}
         </section>
       </Wrapper>

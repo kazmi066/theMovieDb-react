@@ -1,20 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import { useMovieFetch } from "./hooks/custom/useMovieFetch";
+import Modal from "./Modal";
+import MovieDetails from "./MovieDetails/MovieDetails";
 
-export default function Movie({ item }) {
-  const { title, overview, vote_average, poster_path } = item;
-  const imageUrl = `http://image.tmdb.org/t/p/w600_and_h900_bestv2/${poster_path}`;
+export default function Movie({
+  image,
+  movieId,
+  movieName,
+  clickable,
+  ratings,
+}) {
+  const [show, setShow] = useState(false);
+
+  const [movie, loading, error] = useMovieFetch(movieId);
+  if (error) return <div>Something went wrong ...</div>;
+  if (loading) return <div>loading....</div>;
+
+  const toggleShow = () => {
+    setShow(!show);
+  };
 
   return (
     <Wrapper>
-      <div className="movie">
-        <img className="poster_image" src={imageUrl} alt="not found" />
-        <div className="details">
-          <h4>{title}</h4>
-          <p className="ratings">{vote_average}</p>
-        </div>
-        <p className="overview">{overview}</p>
-      </div>
+      <Modal show={show} handleShow={toggleShow}>
+        <MovieDetails movieId={movieId} />
+      </Modal>
+      {clickable ? (
+        <>
+          <div className="movie">
+            <img
+              className="poster_image"
+              src={image}
+              alt="not found"
+              onClick={toggleShow}
+            />
+            <div className="details">
+              <h4>{movieName}</h4>
+              <p className="ratings">{ratings}</p>
+            </div>
+          </div>
+          <p className="overview">{movie.overview}</p>
+        </>
+      ) : (
+        <img className="poster_image" src={image} alt="moviecard" />
+      )}
     </Wrapper>
   );
 }
@@ -33,6 +63,10 @@ const Wrapper = styled.div`
     width: 100%;
     height: 80%;
     object-fit: cover;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .movie:hover .overview {
